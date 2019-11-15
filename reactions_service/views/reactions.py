@@ -4,66 +4,72 @@ from reactions_service.background import count_reactions_async
 from flask import Blueprint
 from reactions_service.database import db, Reaction, Counters
 
+import json
+import requests
+
 reacts = Blueprint('reacts', __name__)
 
 
-@reacts.route('/stories/reaction/<storyid>/<reactiontype>/<reacterid>', methods=['POST'])
+@reacts.route('/reactions/<storyid>/<reactiontype>/<reacterid>', methods=['POST'])
 def _reaction(storyid, reactiontype, reacterid):
+
     try:
-        resp_json = add_reaction(reacterid=reacterid, storyid=storyid, reactiontype=reactiontype)
-        return resp_json
+        resp_message = add_reaction(reacterid, storyid, reactiontype)
+        return jsonify({'reply': resp_message,
+                        'reaction': reactiontype,
+                        'story_id': storyid})
+
     except StoryNonExistsError as err_msg:
-        return jsonify({'reply': 'Error', 'reaction': reactiontype, 'story_id': storyid})
+        return jsonify({'reply': str(err_msg),
+                        'reaction': reactiontype,
+                        'story_id': storyid})
 
 
-@reacts.route('/stories/reaction_count/<storyid>', methods=['GET'])
-def _reactions(storyid, reactiontype):
+@reacts.route('/reactions/<storyid>', methods=['GET'])
+def _reactions(storyid):
+
     # return number of like and dislike for a story (async updated)
     try:
-        message = count_reaction(storyid=storyid)
-        return jsonify({'reply': message, 'reaction': reactiontype, 'story_id': storyid})
+        counter = count_reaction(storyid)
+        return counter.to_json() # storyid, likes, dislikes
     except StoryNonExistsError as err_msg:
-        return jsonify({'reply': 'error', 'reaction': reactiontype, 'story_id': storyid})
+        return count_error_json()
 
 
-def exist_story():
-    return False
+def exist_story(story_id):
+    # call Story service API
+    # resp = requests.get('/stories/'+story_id)
+    # story = story_to_json(resp)
+    return True
 
 
-def add_reaction(reacterid, storyid, reactiontype):
-    # TODO call Story service
-    # q = Story.query.filter_by(id=storyid).first()
-    # if q is None:
-    #     raise StoryNonExistsError('Story not exists!')
-
-    res = exist_story()
-    if not res:
+def add_reaction(reacter_id, story_id, reaction_type):
+    if not exist_story(story_id):
         raise StoryNonExistsError('Story not exists!')
 
     old_reaction = Reaction.query.filter_by(
-        user_id=reacterid, story_id=storyid).first()
+        user_id=reacter_id, story_id=story_id).first()
 
     if old_reaction is None:
         new_reaction = Reaction()
-        new_reaction.user_id = reacterid
-        new_reaction.story_id = storyid
-        new_reaction.type = reactiontype
+        new_reaction.user_id = reacter_id
+        new_reaction.story_id = story_id
+        new_reaction.type = reaction_type
         db.session.add(new_reaction)
         db.session.commit()
         message = 'Reaction created!'
-
     else:
-        if int(reactiontype) == int(old_reaction.type):
+        if int(reaction_type) == int(old_reaction.type):
             message = 'Reaction removed!'
             db.session.delete(old_reaction)
             db.session.commit()
         else:
-            old_reaction.type = reactiontype
+            old_reaction.type = reaction_type
             db.session.commit()
             message = 'Reaction changed!'
         # # Update DB counters
-    res = count_reactions_async.delay(story_id=storyid)
-    return jsonify({'reply': message, 'reaction': reactiontype, 'story_id': storyid})
+    res = count_reactions_async.delay(story_id=story_id)
+    return message
 
 
 class StoryNonExistsError(Exception):
@@ -84,6 +90,14 @@ def reacted(user_id, story_id):
 
 
 def count_reaction(storyid):
-    q = Counters.query.filter_by(story_d=storyid).first()
-    return q.to_json()
+    exist_story(storyid)
+    if not exist_story(storyid):
+        raise StoryNonExistsError('Story not exists!')
+    return Counters.query.filter_by(story_id=storyid).first()
 
+
+def count_error_json():
+    m = {'story_id': -1,
+         'likes': -1,
+         'dislikes': -1}
+    return json.dumps(m)

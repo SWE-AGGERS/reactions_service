@@ -29,4 +29,3 @@ class Counters(db.Model):
     def to_json(self):
         counters_d = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         return json.dumps(counters_d)
-
