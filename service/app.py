@@ -2,8 +2,8 @@ import datetime
 
 from flask import Flask
 
-from reactions_service.database import db
-from reactions_service.views import blueprints
+from service.database import db
+from service.views import blueprints
 
 
 def create_app(debug=False):

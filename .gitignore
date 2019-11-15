@@ -106,4 +106,4 @@ venv.bak/
 # redis
 /redis-stable
 .idea/
-/reactions_service/storytellers.db
+/service/storytellers.db

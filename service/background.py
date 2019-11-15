@@ -1,6 +1,6 @@
 from celery import Celery
 
-from reactions_service.database import db, Reaction, Counters
+from service.database import db, Reaction, Counters
 from sqlalchemy import and_
 
 BACKEND = BROKER = 'redis://localhost:6379'
@@ -13,7 +13,7 @@ _APP = None
 # def update_reactions(story_id):
 #     global _APP
 #     if _APP is None:
-#         from reactions_service.app import create_app
+#         from service.app import create_app
 #         app = create_app()
 #         # db.init_app(app)
 #     else:
@@ -39,7 +39,7 @@ def count_reactions_async(story_id):
     # story existed (previously queried Story Service)
     global _APP
     if _APP is None:
-        from reactions_service.app import create_app
+        from service.app import create_app
         app = create_app()
     else:
         app = _APP

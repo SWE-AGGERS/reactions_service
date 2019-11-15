@@ -1,8 +1,8 @@
 from flask import jsonify
 
-from reactions_service.app import create_app
-from reactions_service.database import db, Reaction
-from reactions_service.views.reactions import add_reaction
+from service.app import create_app
+from service.database import db, Reaction
+from service.views.reactions import add_reaction
 
 import unittest
 import mock
@@ -21,7 +21,7 @@ class TestReactionDB(unittest.TestCase):
         # db.drop_all()
         # db.create_all()
         # create reaction
-        with mock.patch('reactions_service.views.reactions.exist_story') as exist_story_mock:
+        with mock.patch('service.views.reactions.exist_story') as exist_story_mock:
             exist_story_mock.return_value = True
             res = add_reaction(1, 1, 1)
             print(res)

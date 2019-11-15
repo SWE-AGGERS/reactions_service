@@ -1,8 +1,8 @@
 
 from flask import jsonify
-from reactions_service.background import count_reactions_async
+from service.background import count_reactions_async
 from flask import Blueprint
-from reactions_service.database import db, Reaction, Counters
+from service.database import db, Reaction, Counters
 
 import json
 import requests
