@@ -8,3 +8,6 @@ services:
     image: "redis:alpine"
     ports:
       - "6379:6379"
+#  celery:
+#    build: .
+#    command: celery worker -l info -A snakeeyes.blueprints.contact.tasks
