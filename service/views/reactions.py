@@ -1,4 +1,3 @@
-
 from flask import jsonify
 from service.background import count_reactions_async
 from flask import Blueprint
@@ -12,7 +11,6 @@ reacts = Blueprint('reacts', __name__)
 
 @reacts.route('/reactions/<storyid>/<reactiontype>/<reacterid>', methods=['POST'])
 def _reaction(storyid, reactiontype, reacterid):
-
     try:
         resp_message = add_reaction(reacterid, storyid, reactiontype)
         return jsonify({'reply': resp_message,
@@ -27,20 +25,15 @@ def _reaction(storyid, reactiontype, reacterid):
 
 @reacts.route('/reactions/<storyid>', methods=['GET'])
 def _reactions(storyid):
-
     # return number of like and dislike for a story (async updated)
     try:
         counter = count_reaction(storyid)
-        return counter.to_json() # storyid, likes, dislikes
-    except StoryNonExistsError as err_msg:
-        return count_error_json()
-
-
-def exist_story(story_id):
-    # call Story service API
-    # resp = requests.get('/stories/'+story_id)
-    # story = story_to_json(resp)
-    return True
+        if counter is not None:
+            return counter.to_json()  # storyid, likes, dislikes
+        else:
+            return Counters.zeros_to_json(storyid)
+    except StoryNonExistsError:
+        return Counters.error_to_json()
 
 
 def add_reaction(reacter_id, story_id, reaction_type):
@@ -96,8 +89,8 @@ def count_reaction(storyid):
     return Counters.query.filter_by(story_id=storyid).first()
 
 
-def count_error_json():
-    m = {'story_id': -1,
-         'likes': -1,
-         'dislikes': -1}
-    return json.dumps(m)
+def exist_story(story_id):
+    # call Story service API
+    # resp = requests.get('/stories/'+story_id)
+    # story = story_to_json(resp)
+    return True

@@ -5,7 +5,6 @@ from flask import Flask
 from service.database import db
 from service.views import blueprints
 
-
 def create_app(debug=False):
     app = Flask(__name__)
     app.config['WTF_CSRF_SECRET_KEY'] = 'A SECRET KEY'

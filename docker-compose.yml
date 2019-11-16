@@ -14,6 +14,6 @@ services:
       - "6379:6379"
   celery:
     build: .
-    command: celery worker -l debug -A service.background
+    command: celery worker -l error -E -A service.background
     volumes: # for bind volume
       - '.:/code'
