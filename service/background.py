@@ -3,7 +3,7 @@ from celery import Celery
 from service.database import db, Reaction, Counters
 from sqlalchemy import and_
 
-BACKEND = BROKER = 'redis://localhost:6379'
+BACKEND = BROKER = 'redis://0.0.0.0:6379'
 celery = Celery(__name__, backend=BACKEND, broker=BROKER)
 
 _APP = None
