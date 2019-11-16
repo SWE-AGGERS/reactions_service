@@ -7,9 +7,9 @@ MAINTAINER Luca Peretti <lucaperetti.lp@gmail.com>
 RUN apt-get update && apt-get install \
   -y --no-install-recommends python3 python3-setuptools python3-pip git
 
-RUN git clone  --single-branch --branch dockerize -q https://github.com/SWE-AGGERS/reactions_service.git
-
-WORKDIR reactions_service
+# RUN git clone  --single-branch --branch dockerize -q https://github.com/SWE-AGGERS/reactions_service.git
+ADD . /code
+WORKDIR code
 RUN python3 -m pip install -r requirements.txt
 # RUN python3 -m pip freeze
 ENV LANG C.UTF-8

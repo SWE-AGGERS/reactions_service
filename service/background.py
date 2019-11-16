@@ -1,7 +1,6 @@
 from celery import Celery
 
 from service.database import db, Reaction, Counters
-from sqlalchemy import and_
 
 BACKEND = BROKER = 'redis://redis:6379'
 celery = Celery(__name__, backend=BACKEND, broker=BROKER)
