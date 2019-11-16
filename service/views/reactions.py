@@ -3,9 +3,6 @@ from service.background import count_reactions_async
 from flask import Blueprint
 from service.database import db, Reaction, Counters
 
-import json
-import requests
-
 reacts = Blueprint('reacts', __name__)
 
 
@@ -28,12 +25,14 @@ def _reactions(storyid):
     # return number of like and dislike for a story (async updated)
     try:
         counter = count_reaction(storyid)
-        if counter is not None:
-            return counter.to_json()  # storyid, likes, dislikes
-        else:
-            return Counters.zeros_to_json(storyid)
+
+        return counter.to_json()  # storyid, likes, dislikes
+
     except StoryNonExistsError:
         return Counters.error_to_json()
+
+    except CounterNonExistsError:
+        return Counters.zeros_to_json(storyid)
 
 
 def add_reaction(reacter_id, story_id, reaction_type):
@@ -69,28 +68,26 @@ class StoryNonExistsError(Exception):
     def __init__(self, value):
         self.value = value
 
-    def __str__(self):
-        return repr(self.value)
 
-
-def reacted(user_id, story_id):
-    q = db.session.query(Reaction).filter_by(
-        story_id=story_id, user_id=user_id).all()
-
-    if len(q) > 0:
-        return q[0].type
-    return 0
+class CounterNonExistsError(Exception):
+    def __init__(self, value):
+        self.value = value
 
 
 def count_reaction(storyid):
     exist_story(storyid)
+
     if not exist_story(storyid):
         raise StoryNonExistsError('Story not exists!')
-    return Counters.query.filter_by(story_id=storyid).first()
+    q = Counters.query.filter_by(story_id=storyid).first()
+
+    if q is None:
+        raise CounterNonExistsError('Counter not yet created!')
+    return q
 
 
 def exist_story(story_id):
     # call Story service API
-    # resp = requests.get('/stories/'+story_id)
+    # resp = requests.get('/stories/'+story_id, timeout=0.01)
     # story = story_to_json(resp)
     return True

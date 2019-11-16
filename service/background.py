@@ -2,7 +2,7 @@ from celery import Celery
 
 from service.database import db, Reaction, Counters
 
-BACKEND = BROKER = 'redis://redis:6379'
+BACKEND = BROKER = 'redis://127.0.0.1:6379'
 celery = Celery(__name__, backend=BACKEND, broker=BROKER)
 
 _APP = None
@@ -43,15 +43,22 @@ def count_reactions_async(story_id):
     else:
         app = _APP
     with app.app_context():
+
+        num_likes = db.session.query(Reaction.story_id).filter_by(
+            story_id=story_id, type=1).count()
+        num_dislikes = db.session.query(Reaction.story_id).filter_by(
+            story_id=story_id, type=2).count()
+
         q = Counters.query.filter_by(story_id=story_id).first()
         if q is not None:
-            num_likes = db.session.query(Reaction.story_id).filter_by(
-                story_id=story_id, type=1).count()
-            num_dislikes = db.session.query(Reaction.story_id).filter_by(
-                story_id=story_id, type=2).count()
-
             q.likes = num_likes
             q.dislikes = num_dislikes
             db.session.commit()
-            return True
-        return False
+        else:
+            q = Counters()
+            q.story_id = story_id
+            q.likes = num_likes
+            q.dislikes = num_dislikes
+            db.session.add(q)
+            db.session.commit()
+        return True

@@ -7,6 +7,12 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
+def empty_db(app):
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+
+
 class Reaction(db.Model):
     __tablename__ = 'reaction'
 
@@ -26,11 +32,6 @@ class Counters(db.Model):
     likes = db.Column(db.Integer)
     dislikes = db.Column(db.Integer)
 
-    def __init__(self, story_id, likes, dislikes):
-        self.story_id = story_id
-        self.likes = likes
-        self.dislikes = dislikes
-
     def to_json(self):
         counters_d = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         return json.dumps(counters_d)
@@ -46,3 +47,5 @@ class Counters(db.Model):
         return json.dumps({'story_id': -1,
                            'likes': -1,
                            'dislikes': -1})
+
+
