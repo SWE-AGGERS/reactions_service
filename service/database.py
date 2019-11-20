@@ -48,4 +48,3 @@ class Counters(db.Model):
                            'likes': -1,
                            'dislikes': -1})
 
-

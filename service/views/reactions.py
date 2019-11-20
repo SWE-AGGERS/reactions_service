@@ -2,9 +2,12 @@ import json
 
 import requests
 from flask import jsonify
+from requests import Timeout
+
 from service.background import count_reactions_async
 from flask import Blueprint
 from service.database import db, Reaction, Counters
+from service.constants import STORIES_SERVICE_IP, STORIES_SERVICE_PORT
 
 reacts = Blueprint('reacts', __name__)
 
@@ -36,6 +39,9 @@ def _reactions(storyid):
 
     except CounterNonExistsError:
         return Counters.zeros_to_json(storyid)
+
+    except StoryServiceConnectionFailed:
+        return Counters.error_to_json()
 
 
 def add_reaction(reacter_id, story_id, reaction_type):
@@ -98,7 +104,6 @@ def count_reaction(storyid):
     @raise StoryNonExistsError: if requested story not exists
     @raise CounterNonExistsError: if counter of the story not exists
     """
-    exist_story(storyid)
 
     if not exist_story(storyid):
         raise StoryNonExistsError('Story not exists!')
@@ -117,6 +122,17 @@ def exist_story(story_id):
     @return: True if story exists, False otherwise
     """
     # call Story service API
-    reply = requests.get('/story_exist/'+story_id, timeout=0.01)
-    body = json.loads(str(reply.data, 'utf8'))
-    return body['result'] == 1
+    try:
+        url = 'http://' + STORIES_SERVICE_IP + ':' + STORIES_SERVICE_PORT + '/story_exist/' + story_id
+        reply = requests.get(url, timeout=1)
+
+        body = json.loads(str(reply.data, 'utf8'))
+        return body['result'] == 1
+    except Timeout:
+        return False
+
+
+class StoryServiceConnectionFailed(Exception):
+    def __init__(self, value):
+        self.value = value
+
