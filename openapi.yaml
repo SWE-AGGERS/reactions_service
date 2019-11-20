@@ -1,0 +1,82 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: SocialDice Reaction Service
+
+paths:
+  /reactions/<storyid>/<reactiontype>/<reacterid>:
+    post:
+      summary: Create a new reaction of type storyid to the story storyid of a client reacterid
+      responses:
+        '200':
+          description: A JSON string with a response message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reply:
+                    type: string
+                    description: >
+                      Messages:
+                       * `'Reaction removed!'` - The reaction has been succesfully removed
+                       * `'Reaction changed!'` - The reaction has changed succesfully
+                       * `'Story not exists!'` - The requested story id doesn't exist
+                  reaction:
+                    type: integer
+                    description: >
+                      types:
+                        * `1` - like
+                        * `2` - dislike
+                  story_id:
+                    type: integer
+
+    delete:
+      summary: Delete a of type storyid to the story storyid of a client reacterid
+      responses:
+        '200':
+          description: A JSON string with a response message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reply:
+                    type: string
+                    description: >
+                      Messages:
+                       * `'Reaction removed!'` - The reaction has been succesfully removed
+                       * `'Story not exists!'` - The requested story id doesn't exist
+                  reaction:
+                    type: integer
+                    description: >
+                      types:
+                        * `1` - like
+                        * `2` - dislike
+                  story_id:
+                    type: integer
+                    
+                    
+  /reactions/<storyid>:
+    get:
+      summary: Request all reaction counters of the story with id storyid
+      responses:
+        '200':
+          description: A JSON string with a response message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  story_id:
+                    type: integer
+                    description: id of the story, -1 if story not exists
+                  like:
+                    type: integer
+                    description: number of likes associated to the story
+                  dislikes:
+                    type: integer
+                    description: number of dislikes associated to the story
+                    
+      
+        

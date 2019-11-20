@@ -1,3 +1,6 @@
+import json
+
+import requests
 from flask import jsonify
 from service.background import count_reactions_async
 from flask import Blueprint
@@ -36,6 +39,18 @@ def _reactions(storyid):
 
 
 def add_reaction(reacter_id, story_id, reaction_type):
+    """
+    Add the reaction of type reaction_type to the story of id
+    story_id from the user reacter_id.
+    The reaction is immediately added to the DB, but the counters
+    will be updated asynchronously
+    @param reacter_id: id of user who react
+    @param story_id: id of the story
+    @param reaction_type: type of reaction [1=like, 2=dislike]
+    @rtype: string
+    @return: return message
+    @raise StoryNonExistsError: if requested story not exists
+    """
     if not exist_story(story_id):
         raise StoryNonExistsError('Story not exists!')
 
@@ -75,6 +90,14 @@ class CounterNonExistsError(Exception):
 
 
 def count_reaction(storyid):
+    """
+    Return the number of reactions of a story identified by storyd
+    @param storyid: id of the story
+    @rtype: Counter
+    @return: Counter object if exist a counter with requested story
+    @raise StoryNonExistsError: if requested story not exists
+    @raise CounterNonExistsError: if counter of the story not exists
+    """
     exist_story(storyid)
 
     if not exist_story(storyid):
@@ -87,7 +110,13 @@ def count_reaction(storyid):
 
 
 def exist_story(story_id):
+    """
+    Check if the story identified by story_id exists, by calling
+    Story Service
+    @param story_id: id of the story
+    @return: True if story exists, False otherwise
+    """
     # call Story service API
-    # resp = requests.get('/stories/'+story_id, timeout=0.01)
-    # story = story_to_json(resp)
-    return True
+    reply = requests.get('/story_exist/'+story_id, timeout=0.01)
+    body = json.loads(str(reply.data, 'utf8'))
+    return body['result'] == 1

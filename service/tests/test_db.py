@@ -56,7 +56,5 @@ class TestReactionDB(unittest.TestCase):
 
                 # force async counting function
                 self.assertRaises(CounterNonExistsError, lambda: count_reaction(1))
-
-
                 sleep(5.0)
                 print(res)
