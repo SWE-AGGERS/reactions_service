@@ -77,6 +77,9 @@ paths:
                   dislikes:
                     type: integer
                     description: number of dislikes associated to the story
-                    
+                  time_updated:
+                    type: string
+                    format: date
+                    description:  date of last update
       
         

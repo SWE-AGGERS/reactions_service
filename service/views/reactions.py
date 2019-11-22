@@ -125,7 +125,6 @@ def exist_story(story_id):
     try:
         url = 'http://' + STORIES_SERVICE_IP + ':' + STORIES_SERVICE_PORT + '/story_exist/' + story_id
         reply = requests.get(url, timeout=1)
-
         body = json.loads(str(reply.data, 'utf8'))
         return body['result'] == 1
     except Timeout:

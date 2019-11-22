@@ -1,5 +1,5 @@
 from celery import Celery
-
+import datetime as dt
 from service.database import db, Reaction, Counters
 
 BACKEND = BROKER = 'redis://127.0.0.1:6379'
@@ -26,10 +26,13 @@ def count_reactions_async(story_id):
 
         q = Counters.query.filter_by(story_id=story_id).first()
         if q is not None:
+            # update counter
             q.likes = num_likes
             q.dislikes = num_dislikes
+            q.time_updated = dt.datetime.now()
             db.session.commit()
         else:
+            # create counter
             q = Counters()
             q.story_id = story_id
             q.likes = num_likes

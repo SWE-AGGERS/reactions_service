@@ -4,7 +4,6 @@ from service.app import create_app
 from service.database import empty_db
 from service.views.reactions import add_reaction, \
     StoryNonExistsError, count_reaction, CounterNonExistsError
-from service.background import count_reactions_async
 
 import unittest
 import mock
@@ -29,7 +28,7 @@ class TestReactionDB(unittest.TestCase):
                 res = add_reaction(1, 1, 1)
                 self.assertEqual('Reaction removed!', res)
 
-                # create dislike
+                # create like
                 res = add_reaction(1, 2, 1)
                 self.assertEqual('Reaction created!', res)
 
@@ -53,8 +52,15 @@ class TestReactionDB(unittest.TestCase):
                 for ii in range(1, 11):
                     res = add_reaction(ii, 1, 1)
                     self.assertEqual('Reaction created!', res)
+                for ii in range(11, 16):
+                    res = add_reaction(ii, 1, 2)
+                    self.assertEqual('Reaction created!', res)
 
                 # force async counting function
-                self.assertRaises(CounterNonExistsError, lambda: count_reaction(1))
-                sleep(5.0)
-                print(res)
+                sleep(3)
+                counter = count_reaction(1)
+                self.assertEqual(counter.likes, 10)
+                self.assertEqual(counter.dislikes, 5)
+
+                # check not exist counter
+                self.assertRaises(CounterNonExistsError, lambda: count_reaction(10))
