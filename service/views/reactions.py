@@ -1,7 +1,7 @@
 import json
 
 import requests
-from flask import jsonify
+from flask import jsonify, request
 from requests import Timeout
 
 from service.background import count_reactions_async
@@ -27,7 +27,7 @@ def _reaction(storyid, reactiontype, reacterid):
 
 
 @reacts.route('/reactions/<storyid>', methods=['GET'])
-def _reactions(storyid):
+def _counts(storyid):
     # return number of like and dislike for a story (async updated)
     try:
         counter = count_reaction(storyid)
@@ -104,9 +104,16 @@ def count_reaction(storyid):
     @raise StoryNonExistsError: if requested story not exists
     @raise CounterNonExistsError: if counter of the story not exists
     """
-
     if not exist_story(storyid):
+        # if exists remove counter of non-exist story
+        q = Counters.query.filter_by(story_id=storyid).first()
+
+        if q is not None:
+            db.session.delete(q)
+            db.session.commit()
+
         raise StoryNonExistsError('Story not exists!')
+
     q = Counters.query.filter_by(story_id=storyid).first()
 
     if q is None:

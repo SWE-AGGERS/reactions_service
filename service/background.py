@@ -39,4 +39,4 @@ def count_reactions_async(story_id):
             q.dislikes = num_dislikes
             db.session.add(q)
             db.session.commit()
-        return True
+        return num_likes, num_dislikes

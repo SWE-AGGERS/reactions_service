@@ -21,9 +21,9 @@ class Reaction(db.Model):
     story_id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.Integer)
 
-    def to_json(self):
-        react_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
-        return json.dumps(react_dict)
+    # def to_json(self):
+    #     react_dict = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    #     return json.dumps(react_dict)
 
 
 class Counters(db.Model):
@@ -53,7 +53,7 @@ class Counters(db.Model):
         return json.dumps({'story_id': story_id,
                            'likes': 0,
                            'dislikes': 0,
-                           'time_updated': dt.datetime.now()})
+                           'time_updated': dt.datetime.now().strftime("%d/%m/%Y")})
 
     @staticmethod
     def error_to_json():

@@ -81,5 +81,9 @@ paths:
                     type: string
                     format: date
                     description:  date of last update
-      
-        
+
+    delete:
+      summary: Remove all reaction counters of the story with id storyid
+      responses:
+        '200':
+          description: A JSON string with a response message
