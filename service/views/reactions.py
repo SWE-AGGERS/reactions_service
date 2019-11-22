@@ -1,7 +1,7 @@
 import json
 
 import requests
-from flask import jsonify, request
+from flask import jsonify
 from requests import Timeout
 
 from service.background import count_reactions_async

@@ -9,7 +9,7 @@ def create_app(debug=False):
     app = Flask(__name__)
     app.config['WTF_CSRF_SECRET_KEY'] = 'A SECRET KEY'
     app.config['SECRET_KEY'] = 'ANOTHER ONE'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///storytellers.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///reactions.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # DEBUGGING AND TESTING
     app.config['SQLALCHEMY_ECHO'] = False
