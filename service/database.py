@@ -7,6 +7,12 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
+def empty_db(app):
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+
+
 class Reaction(db.Model):
     __tablename__ = 'reaction'
 
@@ -29,3 +35,16 @@ class Counters(db.Model):
     def to_json(self):
         counters_d = {c.name: getattr(self, c.name) for c in self.__table__.columns}
         return json.dumps(counters_d)
+
+    @staticmethod
+    def zeros_to_json(story_id):
+        return json.dumps({'story_id': story_id,
+                           'likes': 0,
+                           'dislikes': 0})
+
+    @staticmethod
+    def error_to_json():
+        return json.dumps({'story_id': -1,
+                           'likes': -1,
+                           'dislikes': -1})
+

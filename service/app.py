@@ -2,9 +2,8 @@ import datetime
 
 from flask import Flask
 
-from reactions_service.database import db
-from reactions_service.views import blueprints
-
+from service.database import db
+from service.views import blueprints
 
 def create_app(debug=False):
     app = Flask(__name__)
@@ -28,6 +27,6 @@ def create_app(debug=False):
 
 
 if __name__ == '__main__':
-
     app = create_app()
     app.run()
+
