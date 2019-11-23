@@ -11,7 +11,9 @@ def decode_auth_token(auth_token):
     :return: integer|string
     """
     try:
-        payload = jwt.decode(auth_token, PASS_KEY)
+        payload = jwt.decode(jwt=auth_token,
+                             key=PASS_KEY,
+                             algorithms='HS256')
         return payload['sub']
     except jwt.ExpiredSignatureError:
         raise
@@ -34,7 +36,7 @@ def encode_auth_token(user_id):
             payload,
             PASS_KEY,
             algorithm='HS256'
-        )
+        ).decode()
     except Exception as e:
         return e
 

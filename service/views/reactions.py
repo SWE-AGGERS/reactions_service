@@ -51,9 +51,9 @@ def _counts(storyid):
 
     except CounterNonExistsError:
         return Counters.zeros_to_json(storyid)
-
-    except StoryServiceConnectionFailed:
-        return Counters.error_to_json()
+    #
+    # except StoryServiceConnectionFailed:
+    #     return Counters.error_to_json()
 
 
 def add_reaction(reacter_id, story_id, reaction_type):
@@ -149,7 +149,7 @@ def exist_story(story_id):
     except Timeout:
         return False
 
-
-class StoryServiceConnectionFailed(Exception):
-    def __init__(self, value):
-        self.value = value
+#
+# class StoryServiceConnectionFailed(Exception):
+#     def __init__(self, value):
+#         self.value = value
