@@ -1,9 +1,8 @@
 import jwt
 import datetime as dt
 
-from service import app
-
 PASS_KEY = 'JWT-SECRET-PASS'
+
 
 def decode_auth_token(auth_token):
     """
@@ -38,3 +37,33 @@ def encode_auth_token(user_id):
         )
     except Exception as e:
         return e
+
+
+def validate_token(auth_header, user_id):
+    if auth_header:
+        try:
+            auth_token = auth_header.split(" ")[1]
+        except IndexError:
+            raise MalformedBearerTokenError('Bearer token malformed!')
+    else:
+        auth_token = ''
+
+    if auth_token:
+        try:
+            res = int(user_id) == int(decode_auth_token(auth_token))
+            if not res:
+                raise NotValidTokenError('Provide a valid auth token!')
+        except (jwt.InvalidTokenError, jwt.ExpiredSignatureError):
+            raise NotValidTokenError('Provide a valid auth token!')
+    else:
+        raise NotValidTokenError('Provide a valid auth token!')
+
+
+class MalformedBearerTokenError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+
+class NotValidTokenError(Exception):
+    def __init__(self, value):
+        self.value = value

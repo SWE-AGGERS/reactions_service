@@ -1,13 +1,11 @@
 import json
-import jwt
 import requests
 
-import datetime as dt
-
-from flask import jsonify, request, make_response
+from flask import jsonify, request
 from requests import Timeout
 
-from service.auth import decode_auth_token, encode_auth_token
+from service.auth import MalformedBearerTokenError, validate_token, \
+    NotValidTokenError
 from service.background import count_reactions_async
 from flask import Blueprint
 from service.database import db, Reaction, Counters
@@ -16,68 +14,18 @@ from service.constants import STORIES_SERVICE_IP, STORIES_SERVICE_PORT
 reacts = Blueprint('reacts', __name__)
 
 
-@reacts.route('/createauth/<userid>', methods=['GET'])
-def createauth(userid):
-    try:
-        # generate the auth token
-        auth_token = encode_auth_token(userid)
-        responseObject = {
-            'status': 'success',
-            'message': 'Successfully registered.',
-            'auth_token': auth_token.decode()
-        }
-        return make_response(jsonify(responseObject)), 201
-    except Exception as e:
-        print(e)
-        responseObject = {
-            'status': 'fail',
-            'message': 'Some error occurred. Please try again.'
-        }
-        return make_response(jsonify(responseObject)), 401
-
-
-@reacts.route('/testauth')
-def testauth():
-    # get the auth token
-    auth_header = request.headers.get('Authorization')
-
-    if auth_header:
-        try:
-            auth_token = auth_header.split(" ")[1]
-        except IndexError:
-            responseObject = {
-                'status': 'fail',
-                'message': 'Bearer token malformed.'
-            }
-            return make_response(jsonify(responseObject)), 401
-    else:
-        auth_token = ''
-
-    if auth_token:
-        try:
-            resp = decode_auth_token(auth_token)
-            responseObject = {
-                'status': 'success',
-                'message': 'well done'
-            }
-            return make_response(jsonify(responseObject)), 200
-
-        except (jwt.InvalidTokenError, jwt.ExpiredSignatureError):
-            responseObject = {
-                'status': 'fail',
-                'message': 'Provide a valid auth token.'
-            }
-            return make_response(jsonify(responseObject)), 401
-    else:
-        responseObject = {
-            'status': 'fail',
-            'message': 'Provide a valid auth token.'
-        }
-        return make_response(jsonify(responseObject)), 401
-
-
 @reacts.route('/reactions/<storyid>/<reactiontype>/<reacterid>', methods=['POST'])
 def _reaction(storyid, reactiontype, reacterid):
+    # get TOKEN from header and check
+    auth_header = request.headers.get('Authorization')
+    try:
+        validate_token(auth_header, reacterid)
+
+    except (MalformedBearerTokenError, NotValidTokenError) as err_msg:
+        return jsonify({'reply': str(err_msg),
+                        'reaction': reactiontype,
+                        'story_id': storyid})
+    # add reaction only if the story exists
     try:
         resp_message = add_reaction(reacterid, storyid, reactiontype)
         return jsonify({'reply': resp_message,
