@@ -4,7 +4,6 @@ import json
 from time import sleep
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func, DateTime
 
 db = SQLAlchemy()
 
