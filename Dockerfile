@@ -6,7 +6,7 @@ MAINTAINER Luca Peretti <lucaperetti.lp@gmail.com>
 # RUN git clone dockerize -q https://github.com/SWE-AGGERS/reactions_service.git
 
 RUN apt-get update && apt-get install \
-  -y --no-install-recommends python3 python3-setuptools python3-pip git
+  -y --no-install-recommends python3 python3-setuptools python3-pip # git
 
 # RUN git clone --single-branch --branch dockerize -q https://github.com/SWE-AGGERS/reactions_service.git
 # RUN git clone -q https://github.com/SWE-AGGERS/reactions_service.git

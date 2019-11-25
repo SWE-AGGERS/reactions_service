@@ -1,17 +1,11 @@
 # encoding: utf8
 import datetime as dt
 import json
+from time import sleep
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func, DateTime
 
 db = SQLAlchemy()
-
-
-def empty_db(app):
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
 
 
 class Reaction(db.Model):
@@ -34,6 +28,7 @@ class Counters(db.Model):
     likes = db.Column(db.Integer)
     dislikes = db.Column(db.Integer)
     time_updated = db.Column(db.DateTime)
+
     # time_updated = db.Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     def __init__(self, *args, **kw):
@@ -60,3 +55,10 @@ class Counters(db.Model):
         return json.dumps({'story_id': -1,
                            'likes': -1,
                            'dislikes': -1})
+
+
+def empty_db(app):
+    sleep(2)
+    with app.app_context():
+        db.drop_all()
+        db.create_all()

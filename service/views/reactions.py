@@ -1,9 +1,11 @@
 import json
-
 import requests
-from flask import jsonify
+
+from flask import jsonify, request
 from requests import Timeout
 
+from service.auth import MalformedBearerTokenError, validate_token, \
+    NotValidTokenError
 from service.background import count_reactions_async
 from flask import Blueprint
 from service.database import db, Reaction, Counters
@@ -14,6 +16,16 @@ reacts = Blueprint('reacts', __name__)
 
 @reacts.route('/reactions/<storyid>/<reactiontype>/<reacterid>', methods=['POST'])
 def _reaction(storyid, reactiontype, reacterid):
+    # get TOKEN from header and check
+    auth_header = request.headers.get('Authorization')
+    try:
+        validate_token(auth_header, reacterid)
+
+    except (MalformedBearerTokenError, NotValidTokenError) as err_msg:
+        return jsonify({'reply': str(err_msg),
+                        'reaction': reactiontype,
+                        'story_id': storyid})
+    # add reaction only if the story exists
     try:
         resp_message = add_reaction(reacterid, storyid, reactiontype)
         return jsonify({'reply': resp_message,
@@ -39,9 +51,9 @@ def _counts(storyid):
 
     except CounterNonExistsError:
         return Counters.zeros_to_json(storyid)
-
-    except StoryServiceConnectionFailed:
-        return Counters.error_to_json()
+    #
+    # except StoryServiceConnectionFailed:
+    #     return Counters.error_to_json()
 
 
 def add_reaction(reacter_id, story_id, reaction_type):
@@ -137,8 +149,7 @@ def exist_story(story_id):
     except Timeout:
         return False
 
-
-class StoryServiceConnectionFailed(Exception):
-    def __init__(self, value):
-        self.value = value
-
+#
+# class StoryServiceConnectionFailed(Exception):
+#     def __init__(self, value):
+#         self.value = value
