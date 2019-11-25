@@ -1,4 +1,6 @@
 # reactions_service
+[![Build Status](https://travis-ci.org/SWE-AGGERS/reactions_service.svg?branch=master)](https://travis-ci.org/SWE-AGGERS/reactions_service)
+[![Coverage Status](https://coveralls.io/repos/github/SWE-AGGERS/reactions_service/badge.svg?branch=master)](https://coveralls.io/github/SWE-AGGERS/reactions_service?branch=master)
 
 ## Build and run docker container
 
