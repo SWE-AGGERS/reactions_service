@@ -30,31 +30,6 @@ paths:
                         * `2` - dislike
                   story_id:
                     type: integer
-
-    delete:
-      summary: Delete a of type storyid to the story storyid of a client reacterid
-      responses:
-        '200':
-          description: A JSON string with a response message
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  reply:
-                    type: string
-                    description: >
-                      Messages:
-                       * `'Reaction removed!'` - The reaction has been succesfully removed
-                       * `'Story not exists!'` - The requested story id doesn't exist
-                  reaction:
-                    type: integer
-                    description: >
-                      types:
-                        * `1` - like
-                        * `2` - dislike
-                  story_id:
-                    type: integer
                     
                     
   /reactions/<storyid>:
@@ -82,8 +57,20 @@ paths:
                     format: date
                     description:  date of last update
 
-    delete:
-      summary: Remove all reaction counters of the story with id storyid
+  /reacted_on/<storyid>/<userid>:
+    get:
+      summary: Check if a user has already add a reaction to the given story
       responses:
         '200':
           description: A JSON string with a response message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type: integer
+                    description: >
+                      types:
+                        * '0' - no reaction added
+                        * `1` - like
+                        * `2` - dislike

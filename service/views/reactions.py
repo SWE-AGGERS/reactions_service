@@ -56,6 +56,16 @@ def _counts(storyid):
     #     return Counters.error_to_json()
 
 
+@reacts.route('/reacted_on/<storyid>/<userid>', methods=['GET'])
+def _reacted_on(storyid, userid):
+    q = db.session.query(Reaction).filter_by(
+        story_id=storyid, user_id=userid).all()
+
+    if len(q) > 0:
+        return jsonify({'reaction': q[0].type})
+    return jsonify({'reaction': 0})
+
+
 def add_reaction(reacter_id, story_id, reaction_type):
     """
     Add the reaction of type reaction_type to the story of id
