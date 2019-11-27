@@ -2,7 +2,7 @@ from celery import Celery
 import datetime as dt
 from service.database import db, Reaction, Counters
 
-BACKEND = BROKER = 'redis://0.0.0.0:6379'
+BACKEND = BROKER = 'redis://172.28.1.7:6379'
 celery = Celery(__name__, backend=BACKEND, broker=BROKER)
 
 _APP = None
