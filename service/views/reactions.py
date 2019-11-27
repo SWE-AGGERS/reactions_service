@@ -152,9 +152,9 @@ def exist_story(story_id):
     """
     # call Story service API
     try:
-        url = 'http://' + STORIES_SERVICE_IP + ':' + STORIES_SERVICE_PORT + '/story_exist/' + story_id
+        url = 'http://' + STORIES_SERVICE_IP + ':' + STORIES_SERVICE_PORT + '/story_exists/' + str(story_id)
         reply = requests.get(url, timeout=1)
-        body = json.loads(str(reply.data, 'utf8'))
+        body = reply.json()
         return body['result'] == 1
     except Timeout:
         return False
